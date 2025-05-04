@@ -1,4 +1,5 @@
-
+// config
+import 'dotenv/config';
 
 // dependencies
 import createError from 'http-errors';
@@ -9,13 +10,35 @@ import path from 'path';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import session from 'express-session';
-import passport from 'passport';
+import mysql from 'mysql2/promise';
+import createDebug from 'debug';
 
-const debug = require('debug')('higgs-backend:server');
+import login from './routes/login.js';
+import logout from './routes/logout.js';
+import test from './routes/test.js';
+import wall from './routes/wall.js';
+
+const debug = createDebug('server');
+const __dirname = path.resolve();
+
+const db = mysql.createPool({
+    host: process.env.DB_ADDR,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    maxIdle: 10,
+    idleTimeout: 60000,
+    queueLimit: 0,
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0,
+});
 
 // initilize app
 var app = express();
-app.set('port', process.env.PORT);
+app.set('port', process.env.DB_PORT);
 
 // app middleware
 app.use(cors());
@@ -34,13 +57,17 @@ app.use(session({
     }  
 }));
 
-// TODO: connect to database
-
 // user authentication
-app.use(passport.initialize());
-app.use(passport.session());
+app.use('/login', login);
+app.use('/logout', logout);
+app.use('/test', test);
+app.use('/api', wall);
+// search
+// list of interactions
+app.use('/api/v1/')
+// tweet lookup
+// reply lookup
 
-// TODO: routers
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -60,13 +87,13 @@ app.use(function(err, req, res, next) {
 // initilize HTTP server and load app into it
 var server = http.createServer(app);
 
-server.listen(process.env.PORT);
+server.listen(process.env.WS_PORT);
 server.on('listening', onListening);
 server.on('error', onError);
 
 // event handler to note when server is listening
 function onListening() {
-    debug('Listening on ' + process.env.PORT);
+    debug('Listening on ' + process.env.WS_PORT);
 }
 
 // event handler for server errors
@@ -87,3 +114,5 @@ function onError(error) {
             throw error;
     }
 }
+
+export const data = db;
