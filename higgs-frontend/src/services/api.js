@@ -11,6 +11,12 @@ export const deleteInteraction = (id) =>
 export const getTweetById = (id) =>
   axios.get(`http://localhost:3000/tweets/${id}`);
 
+export const createInteraction = (data) =>
+  axios.post('http://localhost:3000/interactions', data);
+
+export const updateInteraction = (id, data) =>
+  axios.put(`http://localhost:3000/interactions/${id}`, data);
+
 export const fetchInteractions = () => api.get('/interactions');
 
 // export const login = (username, password) => api.post('/login', { username, password });

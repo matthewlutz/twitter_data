@@ -38,7 +38,6 @@ function EditTweetModal({ tweet, onUpdate, onDelete, onClose }) {
         </select>
         <textarea name="content" value={form.content} onChange={handleChange} style={styles.textarea} />
         <input name="timestamp" type="datetime-local" value={form.timestamp} onChange={handleChange} style={styles.input} />
-        <input name="media" value={form.media || ''} onChange={handleChange} style={styles.input} />
         <div style={styles.buttonGroup}>
           <button onClick={handleUpdate} style={styles.update}>Update</button>
           <button onClick={handleDelete} style={styles.delete}>Delete</button>

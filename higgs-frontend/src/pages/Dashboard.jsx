@@ -58,22 +58,23 @@ function Dashboard() {
   };
 
   //handler for updating tweets
-  const handleUpdateTweet = (updated) => {
-    setInteractions(prev => prev.map(i => i.id === updated.id ? updated : i));
+  const handleUpdateTweet = async (updated) => {
+    try {
+      await updateInteraction(updated.id, updated);
+      setInteractions(prev => prev.map(i => i.id === updated.id ? updated : i));
+    } catch (err) {
+      alert("Failed to update tweet.");
+    }
   };
 
   //handler for adding a tweet
-  const handleAddTweet = (form) => {
-    const newInteraction = {
-      id: interactions.length + 1,
-      userA: form.userA,
-      userB: form.userB,
-      type: form.type,
-      timestamp: form.timestamp,
-      tweetId: `t${interactions.length + 100}`,
-      follows: false,
-    };
-    setInteractions([newInteraction, ...interactions]);
+  const handleAddTweet = async (form) => {
+    try {
+      const res = await createInteraction(form);
+      setInteractions([form, ...interactions]);
+    } catch (err) {
+      alert("Failed to add tweet.");
+    }
   };
 
   return (

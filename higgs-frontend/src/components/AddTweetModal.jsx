@@ -7,7 +7,6 @@ function AddTweetModal({ onClose, onAdd }) {
     type: 'retweet',
     content: '',
     timestamp: '',
-    media: '',
   });
 
   const handleChange = (e) => {
@@ -75,13 +74,6 @@ function AddTweetModal({ onClose, onAdd }) {
             value={form.timestamp}
             onChange={handleChange}
             required
-            style={styles.input}
-          />
-          <input
-            name="media"
-            placeholder="Media path (optional)"
-            value={form.media}
-            onChange={handleChange}
             style={styles.input}
           />
           <div style={styles.buttonGroup}>
