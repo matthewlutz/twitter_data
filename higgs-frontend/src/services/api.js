@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3000', //backend server port
+  baseURL: '/', //backend server port
   withCredentials: false, // turn auth cookies to false
 });
 
@@ -9,10 +9,10 @@ export const deleteInteraction = (id) =>
   api.delete(`/interactions/${id}`);
 
 export const getTweetById = (id) =>
-  axios.get(`http://localhost:3000/tweets/${id}`);
+  axios.get(`/tweets/${id}`);
 
 export const createInteraction = (data) =>
-  axios.post('http://localhost:3000/interactions', data);
+  api.post('/interactions', data);
 
 export const updateInteraction = (id, data) =>
   axios.put(`http://localhost:3000/interactions/${id}`, data);
