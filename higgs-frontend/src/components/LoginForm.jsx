@@ -10,8 +10,8 @@ function LoginForm({ onLogin }) {
     e.preventDefault();
     try {
       const res = await axios.post('http://localhost:3000/login', {
-        username,
-        password,
+        user: username,
+        pass: password,
       });
       onLogin(res.data.token);
     } catch (err) {
