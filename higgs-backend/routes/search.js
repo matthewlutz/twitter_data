@@ -75,7 +75,9 @@ router.get('/', async (req, res, next) => {
 
 router.get('/search', async (req, res, next) => {
     try {
-
+        /**
+         * Cannot implement properly, as search feature purely exists on front end.
+         */
     } catch (err) {
         console.log(err);
     };
