@@ -9,7 +9,7 @@ router.get('/', async (req, res, next) => {
 
         const replyDat = await db.query(
             `SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, t.timestamp, r.content AS content,
-            IF(f.follower IS NOT NULL, 'true', 'false') AS follows
+            IF(f.follower IS NOT NULL, "true", "false") AS follows
             FROM Reply AS r 
             LEFT JOIN Tweet AS t 
                 ON r.tweetId = t.tweetId 
@@ -29,7 +29,7 @@ router.get('/', async (req, res, next) => {
 
         const retweetDat = await db.query(
             `SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, t.timestamp,
-            IF(f.follower IS NOT NULL, 'true', 'false') AS follows 
+            IF(f.follower IS NOT NULL, "true", "false") AS follows 
             FROM Retweet AS r 
             LEFT JOIN Tweet AS t 
                 ON r.tweetId = t.tweetId 
@@ -48,7 +48,7 @@ router.get('/', async (req, res, next) => {
         // list of Mention interactions appended with type variable.
         const mentionDat = await db.query(
             `SELECT a.userName AS userA, b.userName AS userB, m.tweetId AS tweetId, t.timestamp, 
-            IF(f.follower IS NOT NULL, 'true', 'false') AS follows
+            IF(f.follower IS NOT NULL, "true", "false") AS follows
             FROM Mention AS m 
             LEFT JOIN Tweet AS t 
                 ON m.tweetId = t.tweetId 
