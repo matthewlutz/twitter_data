@@ -5,32 +5,67 @@ const router = express.Router();
 
 router.get('/', async (req, res, next) => {
     try {
-        var list = [];
-        var dat = await db.query(
-            'SELECT t.userId AS userA, r.userId AS userB, r.tweetId AS tweetId, t.timestamp, r.content AS content FROM Reply AS r LEFT JOIN Tweet AS t ON r.tweetId = t.tweetId'
-        );
-        for (let i = 0; i < dat[0].length; i++) {
-            dat[0][i].type = "Reply";
-        };
-        list = dat[0];
+        // list of Reply interactions appended with type variable.
 
-        dat = await db.query(
-            'SELECT t.userId AS userA, r.userId AS userB, r.tweetId AS tweetId, t.timestamp FROM Retweet AS r LEFT JOIN Tweet AS t ON r.tweetId = t.tweetId'
+        const replyDat = await db.query(
+            `SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, t.timestamp, r.content AS content,
+            IF(f.follower IS NOT NULL, 'true', 'false') AS follows
+            FROM Reply AS r 
+            LEFT JOIN Tweet AS t 
+                ON r.tweetId = t.tweetId 
+            JOIN User AS a 
+                ON t.userId = a.userId 
+            JOIN User AS b 
+                ON r.userId = b.userId
+            LEFT JOIN Follow AS f 
+               	ON f.follower = r.userId AND f.following = t.userId`
         );
-        for (let i = 0; i < dat[0].length; i++) {
-            dat[0][i].type = "Retweet";
-        };
-        list = list.concat(dat[0]);
 
-        dat = await db.query(
-            'SELECT t.userId AS userA, m.userId AS userB, m.tweetId AS tweetId, t.timestamp FROM Mention AS m LEFT JOIN Tweet AS t ON m.tweetId = t.tweetId'
+        for (let i = 0; i < replyDat[0].length; i++) {
+            replyDat[0][i].type = "reply";
+        };
+
+        // list of Retweet interactions appended with type variable.
+
+        const retweetDat = await db.query(
+            `SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, t.timestamp,
+            IF(f.follower IS NOT NULL, 'true', 'false') AS follows 
+            FROM Retweet AS r 
+            LEFT JOIN Tweet AS t 
+                ON r.tweetId = t.tweetId 
+            JOIN User AS a 
+                ON t.userId = a.userId 
+            JOIN User AS b 
+                ON r.userId = b.userId
+            LEFT JOIN Follow AS f 
+               	ON f.follower = r.userId AND f.following = t.userId`
         );
-        for (let i = 0; i < dat[0].length; i++) {
-            dat[0][i].type = "Mention";
-        };
-        list = list.concat(dat[0]);
 
-        console.log([list]);
+        for (let i = 0; i < retweetDat[0].length; i++) {
+            retweetDat[0][i].type = "retweet";
+        };
+
+        // list of Mention interactions appended with type variable.
+        const mentionDat = await db.query(
+            `SELECT a.userName AS userA, b.userName AS userB, m.tweetId AS tweetId, t.timestamp, 
+            IF(f.follower IS NOT NULL, 'true', 'false') AS follows
+            FROM Mention AS m 
+            LEFT JOIN Tweet AS t 
+                ON m.tweetId = t.tweetId 
+            JOIN User AS a 
+                ON t.userId = a.userId 
+            JOIN User AS b 
+                ON m.userId = b.userId
+            LEFT JOIN Follow AS f 
+               	ON f.follower = m.userId AND f.following = t.userId`
+        );
+        for (let i = 0; i < mentionDat[0].length; i++) {
+            mentionDat[0][i].type = "mention";
+        };
+        
+        // concat arrays for loading in json reply body.
+        const list = replyDat[0].concat(retweetDat[0]).concat(mentionDat[0]);
+
         res.status(200).send(list);
     } catch (err) {
         console.log(err);
