@@ -15,6 +15,9 @@ router.get('/admin', async (req, res, next) => {
     } catch (err) {
         console.error(err);
     }
+
+    // send 500 if server error.
+    res.sendStatus(500);
 });
 
 // create a new admin user.
@@ -24,17 +27,19 @@ router.post('/admin', async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(req.body.pass, 10);
 
         // attempt to create new admin user.
-        const result = await db.query(
+        await db.query(
             `INSERT INTO Admin (adminId, name, passHash)
             VALUES (?, ?, ?)`,
             [crypto.getRandomValues(new Uint16Array(1))[0], req.body.user, hashedPassword]
-        )
+        );
 
         res.status(201).send();
     } catch (err) {
         console.error(err);
     }
 
+    // send 500 if server error.
+    res.sendStatus(500);
 });
 
 // update existing admin user name and/or password. assumes button press from list of exisiting admin users.
@@ -66,8 +71,11 @@ router.put('/admin/:id', async (req, res, next) => {
             res.status(204).send();
         } else res.status(400).send();
     } catch (err) {
-        console.error(err)
-    };
+        console.error(err);
+    }
+
+    // send 500 if server error.
+    res.sendStatus(500);
 });
 
 // delete an admin user.
@@ -78,11 +86,15 @@ router.delete('/admin/:id', async (req, res, next) => {
             FROM Admin
             WHERE adminId = ?`,
             [req.params.id]
-        )
+        );
+        
         res.status(204).send();
     } catch (err) {
         console.error(err);
     }
+
+    // send 500 if server error.
+    res.sendStatus(500);
 });
 
 export default router;

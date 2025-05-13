@@ -37,6 +37,9 @@ router.post('/', async (req, res, next) => {
     } catch (err) {
         console.error(err);
     }
+
+    // send 500 if server error.
+    res.sendStatus(500);
 });
 
 export default router;
