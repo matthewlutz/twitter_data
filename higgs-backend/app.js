@@ -22,6 +22,7 @@ import admin from './routes/admin.js';
 const debug = createDebug('server');
 const __dirname = path.resolve();
 
+// create pool of connections for interacting with database
 const db = mysql.createPool({
     host: process.env.DB_ADDR,
     port: process.env.DB_PORT,
@@ -61,7 +62,10 @@ app.use(session({
 // user authentication
 app.use('/login', login);
 app.use('/logout', logout);
-app.use('/api', wall);
+
+// wall disabled for demo of queries not supported by UI.
+
+// app.use('/api', wall);
 
 // data lookup and CRUD operations
 app.use('/api', search);
