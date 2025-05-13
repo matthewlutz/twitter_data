@@ -15,7 +15,6 @@ import createDebug from 'debug';
 
 import login from './routes/login.js';
 import logout from './routes/logout.js';
-import test from './routes/test.js';
 import wall from './routes/wall.js';
 import search from './routes/search.js';
 
@@ -61,7 +60,6 @@ app.use(session({
 // user authentication
 app.use('/login', login);
 app.use('/logout', logout);
-app.use('/test', test);
 app.use('/api', wall);
 
 // data lookup and CRUD operations
