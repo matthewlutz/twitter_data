@@ -9,7 +9,7 @@ export const deleteInteraction = (id) =>
   api.delete(`/interactions/${id}`);
 
 export const getTweetById = (id) =>
-  axios.get(`/tweets/${id}`);
+  api.get(`/tweets/${id}`);
 
 export const createInteraction = (data) =>
   api.post('/interactions', data);
