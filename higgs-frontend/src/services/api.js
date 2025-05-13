@@ -9,7 +9,7 @@ export const deleteInteraction = (id) =>
   api.delete(`/interactions/${id}`);
 
 export const getTweetById = (id) =>
-  api.get(`/tweets/${id}`);
+  api.get(`/tweet/${id}`);
 
 export const createInteraction = (data) =>
   api.post('/interactions', data);
