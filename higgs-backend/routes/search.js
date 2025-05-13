@@ -5,81 +5,133 @@ const router = express.Router();
 
 router.get('/', async (req, res, next) => {
     try {
-
-        // list of Reply interactions appended with type variable.
-        const replyDat = await db.query(
-            `SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, t.timestamp, r.content AS content,
-            IF(f.follower IS NOT NULL, 1, 0) AS follows
-            FROM Reply AS r 
-            LEFT JOIN Tweet AS t 
-                ON r.tweetId = t.tweetId 
-            JOIN User AS a 
-                ON t.userId = a.userId 
-            JOIN User AS b 
-                ON r.userId = b.userId
-            LEFT JOIN Follow AS f 
-               	ON f.follower = r.userId AND f.following = t.userId`
+        // advanced query to provide all instances of every interaction to accomidate from front end functionality.
+        const results = await db.query(
+            `SELECT * FROM (
+                SELECT a.userName AS userA, b.userName AS userB, m.tweetId AS tweetId, m.timestamp, 'mention' AS type,
+                    IF(f.follower IS NOT NULL, 1, 0) AS follows
+                FROM Mention AS m 
+                LEFT JOIN Tweet AS t 
+                    ON m.tweetId = t.tweetId 
+                JOIN User AS a 
+                    ON t.userId = a.userId 
+                JOIN User AS b 
+                    ON m.userId = b.userId
+                LEFT JOIN Follow AS f 
+                    ON f.follower = m.userId AND f.following = t.userId
+            ) AS A
+            UNION ALL
+            SELECT * FROM (
+                SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, r.timestamp, 'retweet' AS type,
+                    IF(f.follower IS NOT NULL, 1, 0) AS follows
+                FROM Retweet AS r 
+                LEFT JOIN Tweet AS t 
+                    ON r.tweetId = t.tweetId 
+                JOIN User AS a 
+                    ON t.userId = a.userId 
+                JOIN User AS b 
+                    ON r.userId = b.userId
+                LEFT JOIN Follow AS f 
+                    ON f.follower = r.userId AND f.following = t.userId
+            ) AS B
+            UNION ALL
+            SELECT * FROM (
+                SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, r.timestamp, 'reply' AS type,
+                    IF(f.follower IS NOT NULL, 1, 0) AS follows
+                FROM Reply AS r 
+                LEFT JOIN Tweet AS t 
+                    ON r.tweetId = t.tweetId 
+                JOIN User AS a 
+                    ON t.userId = a.userId 
+                JOIN User AS b 
+                    ON r.userId = b.userId
+                LEFT JOIN Follow AS f 
+                    ON f.follower = r.userId AND f.following = t.userId
+            ) AS C`
         );
-
-        for (let i = 0; i < replyDat[0].length; i++) {
-            replyDat[0][i].type = "reply";
-        };
-
-        // list of Retweet interactions appended with type variable.
-        const retweetDat = await db.query(
-            `SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, t.timestamp,
-            IF(f.follower IS NOT NULL, 1, 0) AS follows 
-            FROM Retweet AS r 
-            LEFT JOIN Tweet AS t 
-                ON r.tweetId = t.tweetId 
-            JOIN User AS a 
-                ON t.userId = a.userId 
-            JOIN User AS b 
-                ON r.userId = b.userId
-            LEFT JOIN Follow AS f 
-               	ON f.follower = r.userId AND f.following = t.userId`
-        );
-
-        for (let i = 0; i < retweetDat[0].length; i++) {
-            retweetDat[0][i].type = "retweet";
-        };
-
-        // list of Mention interactions appended with type variable.
-        const mentionDat = await db.query(
-            `SELECT a.userName AS userA, b.userName AS userB, m.tweetId AS tweetId, t.timestamp, 
-            IF(f.follower IS NOT NULL, 1, 0) AS follows
-            FROM Mention AS m 
-            LEFT JOIN Tweet AS t 
-                ON m.tweetId = t.tweetId 
-            JOIN User AS a 
-                ON t.userId = a.userId 
-            JOIN User AS b 
-                ON m.userId = b.userId
-            LEFT JOIN Follow AS f 
-               	ON f.follower = m.userId AND f.following = t.userId`
-        );
-        for (let i = 0; i < mentionDat[0].length; i++) {
-            mentionDat[0][i].type = "mention";
-        };
-        
-        // concat arrays for loading in json reply body.
-        const list = replyDat[0].concat(retweetDat[0]).concat(mentionDat[0]);
-
-        res.status(200).send(list);
+       
+        // reply with query results.
+        res.status(200).send(results[0]);
     } catch (err) {
         console.log(err);
-    }
+    } 
+    
+    // if a server error occurs, return 500.
+    res.sendStatus(500);
 });
 
 
-router.get('/search', async (req, res, next) => {
+router.get('/search/:user', async (req, res, next) => {
     try {
-        /**
-         * Cannot implement properly, as search feature purely exists on front end.
-         */
+        // get page number, size, order, and username for query.
+        const pageSize = Number(req.query.size);
+        const orderBy = `\'${req.query.orderby}\'`;
+        const order = req.query.order;
+        const page = req.query.page;
+        const user = req.params.user;
+
+        // calculate the offset variable based off page and size.
+        const offset = Number((page - 1) * (pageSize));
+
+        // advanced query to combine results of all interaction tables, order time by user defined column and order, and limit to current page and page size.
+        const results = await db.query(
+            `SELECT * FROM (
+                SELECT a.userName AS userA, b.userName AS userB, m.tweetId AS tweetId, m.timestamp, 'mention' AS type,
+                    IF(f.follower IS NOT NULL, 1, 0) AS follows
+                FROM Mention AS m 
+                LEFT JOIN Tweet AS t 
+                    ON m.tweetId = t.tweetId 
+                JOIN User AS a 
+                    ON t.userId = a.userId 
+                JOIN User AS b 
+                    ON m.userId = b.userId
+                LEFT JOIN Follow AS f 
+               	    ON f.follower = m.userId AND f.following = t.userId
+                WHERE a.userName = ? OR b.userName = ?
+            ) AS A
+            UNION ALL
+            SELECT * FROM (
+                SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, r.timestamp, 'retweet' AS type,
+                    IF(f.follower IS NOT NULL, 1, 0) AS follows
+                FROM Retweet AS r 
+                LEFT JOIN Tweet AS t 
+                    ON r.tweetId = t.tweetId 
+                JOIN User AS a 
+                    ON t.userId = a.userId 
+                JOIN User AS b 
+                    ON r.userId = b.userId
+                LEFT JOIN Follow AS f 
+                    ON f.follower = r.userId AND f.following = t.userId
+                WHERE a.userName = ? OR b.userName = ?
+            ) AS B
+            UNION ALL
+            SELECT * FROM (
+                SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, r.timestamp, 'reply' AS type,
+                    IF(f.follower IS NOT NULL, 1, 0) AS follows
+                FROM Reply AS r 
+                LEFT JOIN Tweet AS t 
+                    ON r.tweetId = t.tweetId 
+                JOIN User AS a 
+                    ON t.userId = a.userId 
+                JOIN User AS b 
+                    ON r.userId = b.userId
+                LEFT JOIN Follow AS f 
+                    ON f.follower = r.userId AND f.following = t.userId
+                WHERE a.userName = ? OR b.userName = ?
+            ) AS C
+            ORDER BY ? ?
+            LIMIT ? OFFSET ?`,
+            [user, user, user, user, user, user, orderBy, order, pageSize, offset]
+        );
+
+        // reply with query results.
+        res.status(200).send(results[0]);
     } catch (err) {
         console.log(err);
-    };
+    }; 
+    
+    // if a server error occurs, return 500.
+    res.sendStatus(500);
 });
 
 router.get('/tweet/:id', async (req, res, next) => {
@@ -98,6 +150,9 @@ router.get('/tweet/:id', async (req, res, next) => {
     } catch (err) {
         console.log(err);
     }
+
+    // if a server error occurs, return 500.
+    res.sendStatus(500);
 })
 
 export default router;
