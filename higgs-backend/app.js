@@ -17,6 +17,7 @@ import login from './routes/login.js';
 import logout from './routes/logout.js';
 import wall from './routes/wall.js';
 import search from './routes/search.js';
+import admin from './routes/admin.js';
 
 const debug = createDebug('server');
 const __dirname = path.resolve();
@@ -64,6 +65,7 @@ app.use('/api', wall);
 
 // data lookup and CRUD operations
 app.use('/api', search);
+app.use('/api', admin);
 
 
 // catch 404 and forward to error handler
