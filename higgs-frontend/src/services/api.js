@@ -17,7 +17,7 @@ export const createInteraction = (data) =>
 export const updateInteraction = (id, data) =>
   axios.put(`http://localhost:3000/interactions/${id}`, data);
 
-export const fetchInteractions = () => api.get('/interactions');
+export const fetchInteractions = () => api.get('/api');
 
 // export const login = (username, password) => api.post('/login', { username, password });
 // export const deleteInteraction = (id) => api.delete(`/db_name/${id}`);
