@@ -64,10 +64,8 @@ app.use('/logout', logout);
 app.use('/test', test);
 app.use('/api', wall);
 
-
+// data lookup and CRUD operations
 app.use('/api', search);
-// tweet lookup
-// reply lookup
 
 
 // catch 404 and forward to error handler
