@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.get('/', async (req, res, next) => {
     try {
-        // list of Reply interactions appended with type variable.
 
+        // list of Reply interactions appended with type variable.
         const replyDat = await db.query(
             `SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, t.timestamp, r.content AS content,
             IF(f.follower IS NOT NULL, 1, 0) AS follows
@@ -26,7 +26,6 @@ router.get('/', async (req, res, next) => {
         };
 
         // list of Retweet interactions appended with type variable.
-
         const retweetDat = await db.query(
             `SELECT a.userName AS userA, b.userName AS userB, r.tweetId AS tweetId, t.timestamp,
             IF(f.follower IS NOT NULL, 1, 0) AS follows 
@@ -82,5 +81,23 @@ router.get('/search', async (req, res, next) => {
         console.log(err);
     };
 });
+
+router.get('/tweet/:id', async (req, res, next) => {
+    try {
+
+        // retrieve properly formatted data from Tweet with given tweetId.
+        const tweetDat = await db.query(
+            `SELECT timestamp, content, userName AS user
+            FROM Tweet AS t
+            JOIN User AS u ON t.userId = u.userId
+            WHERE t.tweetId = ?`,
+            [req.params.id],
+        )
+        
+        res.status(200).send(tweetDat[0][0]);
+    } catch (err) {
+        console.log(err);
+    }
+})
 
 export default router;
