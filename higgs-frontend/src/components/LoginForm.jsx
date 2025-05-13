@@ -43,13 +43,6 @@ function LoginForm({ onLogin }) {
         <button style={styles.button} type="submit">
           Login
         </button>
-        <button
-          type="button"
-          onClick={() => onLogin('dummy-token')}
-          style={{ ...styles.button, backgroundColor: '#6c757d' }}
-        >
-          Skip Login
-        </button>
         {error && <p style={styles.error}>{error}</p>}
       </form>
     </div>
