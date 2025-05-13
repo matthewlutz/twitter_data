@@ -139,9 +139,12 @@ router.get('/tweet/:id', async (req, res, next) => {
 
         // retrieve properly formatted data from Tweet with given tweetId.
         const tweetDat = await db.query(
-            `SELECT timestamp, content, userName AS user
+            `SELECT timestamp, content, userName AS user, path AS media
             FROM Tweet AS t
-            JOIN User AS u ON t.userId = u.userId
+            JOIN User AS u 
+                ON t.userId = u.userId
+            LEFT JOIN Media AS m
+                ON m.tweetId = t.tweetId
             WHERE t.tweetId = ?`,
             [req.params.id],
         )
