@@ -14,10 +14,9 @@ router.get('/admin', async (req, res, next) => {
         res.status(200).send(adminDat);
     } catch (err) {
         console.error(err);
+        // send 500 if server error.
+        res.sendStatus(500);
     }
-
-    // send 500 if server error.
-    res.sendStatus(500);
 });
 
 // create a new admin user.
@@ -36,10 +35,9 @@ router.post('/admin', async (req, res, next) => {
         res.status(201).send();
     } catch (err) {
         console.error(err);
+        // send 500 if server error.
+        res.sendStatus(500);
     }
-
-    // send 500 if server error.
-    res.sendStatus(500);
 });
 
 // update existing admin user name and/or password. assumes button press from list of exisiting admin users.
@@ -72,10 +70,9 @@ router.put('/admin/:id', async (req, res, next) => {
         } else res.status(400).send();
     } catch (err) {
         console.error(err);
+        // send 500 if server error.
+        res.sendStatus(500);
     }
-
-    // send 500 if server error.
-    res.sendStatus(500);
 });
 
 // delete an admin user.
@@ -91,10 +88,9 @@ router.delete('/admin/:id', async (req, res, next) => {
         res.status(204).send();
     } catch (err) {
         console.error(err);
+        // send 500 if server error.
+        res.sendStatus(500);
     }
-
-    // send 500 if server error.
-    res.sendStatus(500);
 });
 
 export default router;

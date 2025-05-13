@@ -54,10 +54,9 @@ router.get('/', async (req, res, next) => {
         res.status(200).send(results[0]);
     } catch (err) {
         console.log(err);
+        // if a server error occurs, return 500.
+        res.sendStatus(500);
     } 
-    
-    // if a server error occurs, return 500.
-    res.sendStatus(500);
 });
 
 
@@ -128,10 +127,9 @@ router.get('/search/:user', async (req, res, next) => {
         res.status(200).send(results[0]);
     } catch (err) {
         console.log(err);
+        // if a server error occurs, return 500.
+        res.sendStatus(500);
     }; 
-    
-    // if a server error occurs, return 500.
-    res.sendStatus(500);
 });
 
 router.get('/tweet/:id', async (req, res, next) => {
@@ -152,10 +150,9 @@ router.get('/tweet/:id', async (req, res, next) => {
         res.status(200).send(tweetDat[0][0]);
     } catch (err) {
         console.log(err);
+        // if a server error occurs, return 500.
+        res.sendStatus(500);
     }
-
-    // if a server error occurs, return 500.
-    res.sendStatus(500);
 })
 
 export default router;

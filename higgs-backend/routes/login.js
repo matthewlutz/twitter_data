@@ -36,10 +36,9 @@ router.post('/', async (req, res, next) => {
         res.send();
     } catch (err) {
         console.error(err);
+        // send 500 if server error.
+        res.sendStatus(500);
     }
-
-    // send 500 if server error.
-    res.sendStatus(500);
 });
 
 export default router;
