@@ -12,15 +12,18 @@ router.post('/', async (req, res, next) => {
                 req.body.user,
             );       
 
-            const auth = await bcrypt.compare(
-                req.body.pass, 
-                String(dat[0][0]['passHash'])
-            ); 
-            
-            if (auth) {
-                req.session.user = dat[0][0]['adminId'];
-                res.status(200);
-            } else res.status(401);
+            if (dat[0][0] == null) res.status(401).send();
+            else {
+                const auth = await bcrypt.compare(
+                    req.body.pass, 
+                    String(dat[0][0]['passHash'])
+                ); 
+                
+                if (auth) {
+                    req.session.user = dat[0][0]['adminId'];
+                    res.status(200);
+                } else res.status(401);
+            }
         } else res.status(400);
         res.send();
     } catch (err) {

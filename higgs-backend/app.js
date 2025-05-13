@@ -17,6 +17,7 @@ import login from './routes/login.js';
 import logout from './routes/logout.js';
 import test from './routes/test.js';
 import wall from './routes/wall.js';
+import search from './routes/search.js';
 
 const debug = createDebug('server');
 const __dirname = path.resolve();
@@ -62,9 +63,9 @@ app.use('/login', login);
 app.use('/logout', logout);
 app.use('/test', test);
 app.use('/api', wall);
-// search
-// list of interactions
-app.use('/api/v1/')
+
+
+app.use('/api', search);
 // tweet lookup
 // reply lookup
 
