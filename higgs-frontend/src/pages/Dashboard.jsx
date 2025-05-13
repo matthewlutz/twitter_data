@@ -94,7 +94,7 @@ function Dashboard() {
       <InteractionTable
         interactions={interactions}
         filters={filters}
-        onSelectTweet={setSelectedTweet}
+        onSelectTweet={handleTweetSelect}
         onDelete={handleDelete}
         onEdit={setEditingTweet}
       />
